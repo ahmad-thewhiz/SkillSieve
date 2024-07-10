@@ -1,85 +1,80 @@
-import sys
-from crew import RecruitmentCrew
+import time
+
+# FastAPI Imports
+from fastapi import FastAPI, status
+from fastapi.middleware.cors import CORSMiddleware
+
+# Custom Imports
+from src import services
+from database import schemas
+
+# FastAPI App
+app = FastAPI(
+    title="SkillSieve",
+    description="SkillSieve is a platform that helps you to find the right candidate for a job description.",
+)
+
+# CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# connect to db
+
+@app.get("/healthcheck", status_code=status.HTTP_200_OK)
+def current_status():
+    return {"Response": "Server is Live!"}
 
 
-def run():
+# @app.post("/register", response_model=schemas.register_response)
+# def register_user(user: schemas.register_request):
+#     # user registration
+#     pass
+
+
+# @app.post("/login", response_model=schemas.login_response)
+# def login_user(user: schemas.login_request):
+#     # user login
+#     pass
+
+
+# @app.get("/", response_model=schemas.user_details)
+# def get_user_details(username: str):
+#     # verify email in the database
+#     pass
+
+
+@app.get("/run/{username}", response_model=schemas.run_response)
+def run_agent(username: str, query: str):
+
+    start_time = time.time()
     inputs = {
-        'job_requirements': """
-        job_requirement:
-  title: >
-    Software Engineer III, Machine Learning, Search
-  description: >
-    Google's software engineers develop the next-generation technologies that change how billions of users connect, explore, and interact with information and one another. Our products need to handle information at massive scale, and extend well beyond web search. We're looking for engineers who bring fresh ideas from all areas, including information retrieval, distributed computing, large-scale system design, networking and data storage, security, artificial intelligence, natural language processing, UI design and mobile; the list goes on and is growing every day. As a software engineer, you will work on a specific project critical to Google’s needs with opportunities to switch teams and projects as you and our fast-paced business grow and evolve. We need our engineers to be versatile, display leadership qualities and be enthusiastic to take on new problems across the full-stack as we continue to push technology forward.
-
-  responsibilities: >
-    - Write product or system development code.
-    - Participate in, or lead design reviews with peers and stakeholders to decide amongst available technologies.
-    - Review code developed by other developers and provide feedback to ensure best practices (e.g., style guidelines, checking code in, accuracy, testability, and efficiency).
-    - Contribute to existing documentation or educational content and adapt content based on product/program updates and user feedback.
-    - Triage product or system issues and debug/track/resolve by analyzing the sources of issues and the impact on hardware, network, or service operations and quality.
-
-  requirements: >
-    - Bachelor’s degree or equivalent practical experience.
-    - 2 years of experience with software development in one or more programming languages, or 1 year of experience with an advanced degree.
-    - 2 years of experience with data structures or algorithms in either an academic or industry setting.
-
-  preferred_qualifications: >
-    - Master's degree or PhD in Computer Science or related technical field.
-    - 2 years of experience with machine learning algorithms and tools (e.g., TensorFlow), artificial intelligence, deep learning and/or natural language processing.
-    - Experience developing accessible technologies.
-
-  perks_and_benefits: >
-    - Competitive salary and bonuses.
-    - Health, dental, and vision insurance.
-    - Flexible working hours and remote work options.
-    - Professional development opportunities.
-        """
+        "job_requirements": query
     }
-    output = RecruitmentCrew().crew().kickoff(inputs=inputs)
-    return output
+    output = services.run(inputs)
+    time_taken = time.time() - start_time
 
-def train():
-    """
-    Train the crew for a given number of iterations.
-    """
-    inputs = {
-        'job_requirements': """
-        job_requirement:
-  title: >
-    Software Engineer III, Machine Learning, Search
-  description: >
-    Google's software engineers develop the next-generation technologies that change how billions of users connect, explore, and interact with information and one another. Our products need to handle information at massive scale, and extend well beyond web search. We're looking for engineers who bring fresh ideas from all areas, including information retrieval, distributed computing, large-scale system design, networking and data storage, security, artificial intelligence, natural language processing, UI design and mobile; the list goes on and is growing every day. As a software engineer, you will work on a specific project critical to Google’s needs with opportunities to switch teams and projects as you and our fast-paced business grow and evolve. We need our engineers to be versatile, display leadership qualities and be enthusiastic to take on new problems across the full-stack as we continue to push technology forward.
+    return {"username": username, "output": output, "run_time": time_taken}
 
-  responsibilities: >
-    - Write product or system development code.
-    - Participate in, or lead design reviews with peers and stakeholders to decide amongst available technologies.
-    - Review code developed by other developers and provide feedback to ensure best practices (e.g., style guidelines, checking code in, accuracy, testability, and efficiency).
-    - Contribute to existing documentation or educational content and adapt content based on product/program updates and user feedback.
-    - Triage product or system issues and debug/track/resolve by analyzing the sources of issues and the impact on hardware, network, or service operations and quality.
 
-  requirements: >
-    - Bachelor’s degree or equivalent practical experience.
-    - 2 years of experience with software development in one or more programming languages, or 1 year of experience with an advanced degree.
-    - 2 years of experience with data structures or algorithms in either an academic or industry setting.
-
-  preferred_qualifications: >
-    - Master's degree or PhD in Computer Science or related technical field.
-    - 2 years of experience with machine learning algorithms and tools (e.g., TensorFlow), artificial intelligence, deep learning and/or natural language processing.
-    - Experience developing accessible technologies.
-
-  perks_and_benefits: >
-    - Competitive salary and bonuses.
-    - Health, dental, and vision insurance.
-    - Flexible working hours and remote work options.
-    - Professional development opportunities.
-        """
-    }
-    try:
-        output = RecruitmentCrew().crew().train(n_iterations=int(sys.argv[1]), inputs=inputs)
-        return output
+@app.get("/train/{username}", response_model=schemas.train_response)
+def train_agent(username: str, train_details: schemas.train_request):
     
-    except Exception as e:
-        raise Exception(f"An error occurred while training the crew: {e}")
+    start_time = time.time()
+    inputs = {
+        "job_requirements": train_details.job_requirements,
+    }
+    output = services.train(inputs=inputs, n_iterations=train_details.num_of_iterations)
+    time_taken = time.time() - start_time
 
-if __name__ == "__main__":
-  run()
+    return {"username": username, "output": output, "train_time": time_taken}
+
+
+# @app.get("/history/{username}", response_model=schemas.history_response)
+# def get_history(username: str):
+#     # verify email in the database
+#     pass

@@ -1,6 +1,8 @@
 # Virtual Environments
-rec/
-env2/
+venv/
 
 # Environment Variables
 .env
+
+# Temporary Files
+__pycache__/

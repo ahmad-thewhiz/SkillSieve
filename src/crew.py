@@ -1,7 +1,7 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import SerperDevTool, ScrapeWebsiteTool
-from tools.linkedin import LinkedInTool
+from .tools.linkedin import LinkedInTool
 
 @CrewBase
 class RecruitmentCrew():
