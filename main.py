@@ -75,8 +75,9 @@ def train():
         """
     }
     try:
-        RecruitmentCrew().crew().train(n_iterations=int(sys.argv[1]), inputs=inputs)
-
+        output = RecruitmentCrew().crew().train(n_iterations=int(sys.argv[1]), inputs=inputs)
+        return output
+    
     except Exception as e:
         raise Exception(f"An error occurred while training the crew: {e}")
 
