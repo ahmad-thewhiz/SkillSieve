@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  backend:
+    build: .
+    command: sh -c "uvicorn main:app --reload --port=8000 --host=0.0.0.0"
+    env_file:
+      - .env
+    # ports: to expose the container port to the host machine
+    ports:
+      - 8000:8000
+    # volumes: to mount the current directory to the container so that the changes in the code are reflected in the container 
+    volumes: 
+      - .:/app

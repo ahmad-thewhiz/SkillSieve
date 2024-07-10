@@ -1,0 +1,12 @@
+# Virtual Environments
+venv/
+
+# Environment Variables
+.env
+
+# Temporary Files
+__pycache__/
+
+# Testing Files
+output/
+testing.ipynb

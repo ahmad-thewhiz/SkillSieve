@@ -1,6 +1,7 @@
 import time
 from datetime import datetime
 from typing import List
+from dotenv import load_dotenv
 
 # FastAPI Imports
 from fastapi import FastAPI, status, HTTPException
@@ -14,17 +15,24 @@ from database import schemas, databases
 from pymongo import ASCENDING
 from pymongo.errors import DuplicateKeyError
 
+
+# Load Environment Variables
+load_dotenv()
+
+
 # Database Connection
 client = databases.get_client()
 database = databases.get_database(client)
 users_collection = databases.get_collection(database, "users")
 data_collection = databases.get_collection(database, "data")
 
+
 # FastAPI App
 app = FastAPI(
     title="SkillSieve",
     description="SkillSieve is a platform that helps you to find the right candidate for a job description.",
 )
+
 
 # CORS Middleware
 app.add_middleware(
@@ -35,7 +43,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# connect to db
 
 # Healthcheck
 @app.get("/healthcheck", status_code=status.HTTP_200_OK)
@@ -115,7 +122,7 @@ def delete_user(username: str):
 
 
 # Get History
-@app.get("/data/{username}", response_model=List[schemas.run_response])
+@app.get("/history/{username}", response_model=List[schemas.run_response])
 def get_history(username: str):
     user = users_collection.find_one({"username": username})
     

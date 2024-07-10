@@ -1,9 +1,7 @@
 import os
-from dotenv import load_dotenv
 
 from pymongo import MongoClient
 
-load_dotenv()
 
 def get_client():
     try:
@@ -12,12 +10,14 @@ def get_client():
     except Exception as e:
         raise Exception(f"Error connecting to the database: {e}")
 
+
 def get_database(client):
     try:
         db = client[os.getenv("MONGODB_DATABASE_NAME")]
         return db
     except Exception as e:
         raise Exception(f"Error connecting to the database: {e}")
+
 
 def get_collection(db, collection_type):
     try:
