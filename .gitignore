@@ -6,3 +6,6 @@ venv/
 
 # Temporary Files
 __pycache__/
+
+# Testing Files
+testing.ipynb
